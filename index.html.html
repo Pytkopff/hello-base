@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Base Sepolia Hello (Proste)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { padding: 10px 16px; margin: 8px; }
+    #status { margin-top: 12px; color: #333; }
+  </style>
+</head>
+<body>
+  <h2>Base Sepolia — prosta aplikacja</h2>
+  <p>1) Połącz portfel → 2) Wyślij małą transakcję testową</p>
+
+  <button id="connectBtn">Połącz portfel</button>
+  <button id="txBtn" disabled>Wyślij transakcję (0.0001 ETH)</button>
+
+  <div id="status">Status: niepołączony</div>
+
+  <!-- ethers.js CDN (łatwo i działa w przeglądarce) -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
+  <script>
+    const connectBtn = document.getElementById('connectBtn');
+    const txBtn = document.getElementById('txBtn');
+    const status = document.getElementById('status');
+
+    let provider;
+    let signer;
+    let userAddress;
+
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          status.textContent = 'Zainstaluj MetaMask lub Rabby i spróbuj ponownie.';
+          return;
+        }
+        // Poprosi MetaMask o połączenie
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+        status.textContent = 'Połączono: ' + userAddress;
+        txBtn.disabled = false;
+      } catch (e) {
+        status.textContent = 'Błąd podczas łączenia: ' + (e.message || e);
+      }
+    }
+
+    async function sendTx() {
+      try {
+        if (!signer) {
+          status.textContent = 'Najpierw połącz portfel.';
+          return;
+        }
+
+        // Przykładowa transakcja: wyślij 0.0001 ETH samemu do siebie (możesz podać inny adres)
+        const tx = {
+          to: userAddress,
+          value: ethers.parseEther('0.0001'),
+          // opcjonalnie: gasLimit/gasPrice - MetaMask dobierze automatycznie
+        };
+
+        status.textContent = 'Otwieram MetaMask w celu potwierdzenia...';
+        const txResponse = await signer.sendTransaction(tx);
+        status.textContent = 'Transakcja wysłana. Czekam na potwierdzenie...';
+        await txResponse.wait();
+        status.textContent = 'Potwierdzono! Tx hash: ' + txResponse.hash;
+      } catch (e) {
+        status.textContent = 'Błąd transakcji: ' + (e.message || e);
+      }
+    }
+
+    connectBtn.addEventListener('click', connectWallet);
+    txBtn.addEventListener('click', sendTx);
+  </script>
+</body>
+</html>
