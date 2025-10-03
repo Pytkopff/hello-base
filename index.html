@@ -8,6 +8,18 @@
     body { font-family: Arial, sans-serif; padding: 20px; }
     button { padding: 10px 16px; margin: 8px; }
     #status { margin-top: 12px; color: #333; }
+    
+    /* Styl ostrzeżenia na dole */
+    .footer-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -18,6 +30,13 @@
   <button id="txBtn" disabled>Wyślij transakcję (0.0001 ETH)</button>
 
   <div id="status">Status: niepołączony</div>
+
+  <!-- Ostrzeżenie na dole -->
+  <div class="footer-warning">
+    ⚠️ <strong>Uwaga!</strong> To jest testowa aplikacja on-chain na sieci <strong>Base Sepolia</strong>.<br>
+    Wszystkie transakcje są testowe – niczego nie ryzykujesz.<br>
+    Użytkownik podpisuje własne transakcje.
+  </div>
 
   <!-- ethers.js CDN (łatwo i działa w przeglądarce) -->
   <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
@@ -55,11 +74,10 @@
           return;
         }
 
-        // Przykładowa transakcja: wyślij 0.0001 ETH samemu do siebie (możesz podać inny adres)
+        // Przykładowa transakcja: wyślij 0.0001 ETH samemu do siebie
         const tx = {
           to: userAddress,
           value: ethers.parseEther('0.0001'),
-          // opcjonalnie: gasLimit/gasPrice - MetaMask dobierze automatycznie
         };
 
         status.textContent = 'Otwieram MetaMask w celu potwierdzenia...';
